@@ -1,23 +1,14 @@
+import dotenv from 'dotenv';
+
 import { httpServer } from './http-server';
-import { WebSocketServer } from 'ws';
+import { createWsServer } from './ws-server';
 
-const HTTP_PORT = 8181;
-const WS_PORT = 3000;
+dotenv.config();
+console.log('http server port: ', process.env.HTTP_PORT);
+console.log('ws server port: ', process.env.WS_PORT);
 
-console.log(`Start static http server on the ${HTTP_PORT} port!`);
+const HTTP_PORT = Number.parseInt(process.env.HTTP_PORT || '8181');
+const WS_PORT = Number.parseInt(process.env.WS_PORT || '3000');
 
-httpServer.listen(HTTP_PORT);
-
-const wss = new WebSocketServer({ port: WS_PORT });
-
-wss.on('connection', function connection(ws) {
-  ws.on('error', console.error);
-
-  ws.on('message', function message(data) {
-    console.log('received: %s', data);
-  });
-
-  ws.send('something');
-});
-
-// createWsServer(8080, 'ws://localhost:8181');
+httpServer.listen(HTTP_PORT, () => console.log(`Start static http-server on the port ${HTTP_PORT}`));
+createWsServer(WS_PORT);
