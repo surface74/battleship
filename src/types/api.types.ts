@@ -40,6 +40,7 @@ export interface CommonAction {
   type: ApiMessageType;
 }
 
+/**Action type */
 export enum ApiMessageType {
   Reg = 'reg',
   UpdateWinners = 'update_winners',
@@ -54,7 +55,7 @@ export enum ApiMessageType {
   Finish = 'finish',
 }
 
-/** from back on finish*/
+/** Response from back on finish*/
 export interface FinishResponse extends CommonAction {
   type: ApiMessageType.Finish;
   data: {
@@ -62,7 +63,7 @@ export interface FinishResponse extends CommonAction {
   };
 }
 
-/** from back after game start and every attack, miss or kill result*/
+/** Response from back after game start and every attack, miss or kill result*/
 export interface TurnResponse extends CommonAction {
   type: ApiMessageType.Turn;
   data: {
@@ -70,7 +71,7 @@ export interface TurnResponse extends CommonAction {
   };
 }
 
-/** from front to random attack */
+/** Request from front to random attack */
 export interface RandomAttackRequest extends CommonAction {
   type: ApiMessageType.RandomAttack;
   data: {
@@ -79,7 +80,7 @@ export interface RandomAttackRequest extends CommonAction {
   };
 }
 
-/** from back result of attack */
+/** Response from back result of attack */
 export interface AttackResponse extends CommonAction {
   type: ApiMessageType.Attack;
   data: {
@@ -92,7 +93,7 @@ export interface AttackResponse extends CommonAction {
   };
 }
 
-/** from front to attack */
+/** Request from front to attack */
 export interface AttackRequest extends CommonAction {
   type: ApiMessageType.Attack;
   data: {
@@ -103,7 +104,7 @@ export interface AttackRequest extends CommonAction {
   };
 }
 
-/**from back to start game */
+/** Response from back to start game */
 export interface StartGameRespose extends CommonAction {
   type: ApiMessageType.StartGame;
   data: {
@@ -112,7 +113,7 @@ export interface StartGameRespose extends CommonAction {
   };
 }
 
-/** from front to add ships to the board game */
+/** Request from front to add ships to the board game */
 export interface AddShipsRequest extends CommonAction {
   type: ApiMessageType.AddShips;
   data: {
@@ -122,13 +123,13 @@ export interface AddShipsRequest extends CommonAction {
   };
 }
 
-/**from back to update list of one player room */
+/** Response from back to update list of one player room */
 export interface UpdateRoomStateRespose extends CommonAction {
   type: ApiMessageType.UpdateRoomState;
   data: RoomState[];
 }
 
-/** from front to add user to room */
+/** Request from front to add user to room */
 export interface AddUserToRoomRequest extends CommonAction {
   type: ApiMessageType.AddUserToRoom;
   data: {
@@ -136,13 +137,13 @@ export interface AddUserToRoomRequest extends CommonAction {
   };
 }
 
-/**from front to create room */
+/** Request from front to create room */
 export interface CreateRoomRequest extends CommonAction {
   type: ApiMessageType.CreateRoom;
   data: '';
 }
 
-/**from back after create room */
+/** Response from back after create room */
 export interface CreateRoomResponse extends CommonAction {
   type: ApiMessageType.CreateRoom;
   data: {
@@ -151,7 +152,7 @@ export interface CreateRoomResponse extends CommonAction {
   };
 }
 
-/**from front to create/login user */
+/** Request from front to create/login user */
 export interface LoginRequest extends CommonAction {
   type: ApiMessageType.Reg;
   data: {
@@ -160,7 +161,7 @@ export interface LoginRequest extends CommonAction {
   };
 }
 
-/**from back after create/login user */
+/** Response from back after create/login user */
 export interface LoginResponse extends CommonAction {
   type: ApiMessageType.Reg;
   data: {
@@ -171,7 +172,7 @@ export interface LoginResponse extends CommonAction {
   };
 }
 
-/** to front to update winners list */
+/** Response to front to update winners list */
 export interface UpdateWinnersResponse extends CommonAction {
   type: ApiMessageType.UpdateWinners;
   data: Winners[];

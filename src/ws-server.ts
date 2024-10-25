@@ -1,5 +1,6 @@
 import { WebSocket, WebSocketServer } from 'ws';
 import { routes } from './routes/routes';
+import { Message } from './types/message';
 
 export const createWsServer = (port: number): void => {
   const wss = new WebSocketServer({ port: port });
@@ -14,5 +15,5 @@ export const createWsServer = (port: number): void => {
 
   wss.on('error', (error: Error): void => console.log(error.message));
 
-  wss.on('listening', (): void => console.log(`Start ws-server on the port ${port}`));
+  wss.on('listening', (): void => console.log(`${Message.BackStart} ${port}`));
 };
