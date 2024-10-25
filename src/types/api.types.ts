@@ -20,7 +20,7 @@ export type Ship = {
   };
   direction: boolean;
   length: number;
-  type: keyof typeof ShipType;
+  type: ShipType;
 };
 
 export enum ShipType {
@@ -37,7 +37,7 @@ export enum AttackResult {
 }
 
 export interface CommonAction {
-  type: keyof typeof ApiMessageType;
+  type: ApiMessageType;
 }
 
 export enum ApiMessageType {
@@ -71,7 +71,7 @@ export interface TurnResponse extends CommonAction {
 }
 
 /** from front to random attack */
-export interface AttackRequest extends CommonAction {
+export interface RandomAttackRequest extends CommonAction {
   type: ApiMessageType.RandomAttack;
   data: {
     gameId: number | string;
@@ -88,7 +88,7 @@ export interface AttackResponse extends CommonAction {
       y: number;
     };
     currentPlayer: number | string /* id of the player in the current game session */;
-    status: keyof typeof AttackResult;
+    status: AttackResult;
   };
 }
 
@@ -171,7 +171,8 @@ export interface LoginResponse extends CommonAction {
   };
 }
 
-export interface UpdateWinnersRequest extends CommonAction {
+/** to front to update winners list */
+export interface UpdateWinnersResponse extends CommonAction {
   type: ApiMessageType.UpdateWinners;
   data: Winners[];
 }
