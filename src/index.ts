@@ -13,5 +13,5 @@ const WS_PORT = Number.parseInt(process.env.WS_PORT || '3000');
 httpServer.listen(HTTP_PORT, () => console.log(`${Message.FrontStart} ${HTTP_PORT}`));
 createWsServer(WS_PORT);
 
-const dataService = DataService.getInstance();
-console.log(dataService.GetState());
+// const dataService = DataService.getInstance();
+console.log(DataService.GetState());

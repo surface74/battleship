@@ -1,17 +1,18 @@
 import { WebSocket } from 'ws';
 
-import { ApiMessageType, CommonAction, LoginRequest } from '../types/api.types';
-import { LoginRoute } from './login.route';
+import { ApiMessageType, CommonAction } from '../types/api.types';
+import { regRoute } from './reg.route';
 import { Message } from '../types/message';
 
 export const routes = (ws: WebSocket, data: Buffer): void => {
+  console.log('data: ', data);
   const message = JSON.parse(data.toString()) as CommonAction;
-
   const { type: actionType } = message;
+  console.log('message: ', message);
 
   switch (actionType) {
     case ApiMessageType.Reg:
-      LoginRoute(ws, message as LoginRequest);
+      regRoute(ws, message);
       break;
     case ApiMessageType.CreateRoom:
       break;

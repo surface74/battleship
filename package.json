@@ -6,7 +6,8 @@
   "type": "commonjs",
   "scripts": {
     "start": "webpack && node dist/bundle.js",
-    "start:dev": "nodemon src/index.ts"
+    "start:dev": "ts-node-dev --respawn -- src/index.ts",
+    "start:debug": "ts-node-dev --respawn --inspect -- src/index.ts"
   },
   "author": "Siarhei Muliarenka",
   "keywords": [],
@@ -26,6 +27,7 @@
     "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.11.0",
     "webpack": "^5.95.0",
