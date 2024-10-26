@@ -1,4 +1,4 @@
-import { UpdateRoomResponseData } from '../types/api.types';
+import { UpdateRoomResponseData, Winner } from '../types/api.types';
 import Guid from '../utils/guid';
 import { User } from './user.types';
 
@@ -16,7 +16,11 @@ class DataService {
     return DataService.instance;
   }
 
-  public GetState(): string {
+  public getWinners(): Winner[] {
+    return new Array<Winner>();
+  }
+
+  public getState(): string {
     return `db started: users ${this.userStorage.length}`;
   }
 

@@ -1,8 +1,3 @@
-export type Winners = {
-  name: string;
-  wins: number;
-};
-
 export type RoomUser = {
   name: string;
   index: number | string;
@@ -198,8 +193,13 @@ export interface RegResponse extends CommonAction {
   data: RegResponseData;
 }
 
+export type Winner = {
+  name: string;
+  wins: number;
+};
+
 /** Response to front to update winners list */
-export interface UpdateWinnersResponse extends CommonAction {
+export interface WinnersResponse extends CommonAction {
   type: ApiMessageType.UpdateWinners;
-  data: Winners[];
+  data: Winner[];
 }

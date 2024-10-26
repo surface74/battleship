@@ -1,8 +1,14 @@
 import { WebSocket } from 'ws';
-import { RegResponse } from '../types/api.types';
+import { ApiMessageType, RegResponse, RegResponseData } from '../types/api.types';
 
 class RegController {
-  public regUser(ws: WebSocket, response: RegResponse): void {
+  public send(ws: WebSocket, data: RegResponseData): void {
+    const response: RegResponse = {
+      type: ApiMessageType.Reg,
+      data,
+      id: 0,
+    };
+
     const responseString = JSON.stringify({ ...response, data: JSON.stringify(response.data) });
 
     ws.send(responseString, (err?: Error): void => {
