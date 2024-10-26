@@ -1,16 +1,14 @@
 import { WebSocket } from 'ws';
-import { ApiMessageType, RoomState, UpdateRoomResponse } from '../types/api.types';
+import { UpdateRoomResponse } from '../types/api.types';
 
 class RoomController {
-  public updateRoom = (ws: WebSocket, rooms: RoomState[]): void => {
-    const response: UpdateRoomResponse = {
-      type: ApiMessageType.UpdateRoom,
-      data: [...rooms],
-    };
-    ws.send(JSON.stringify(response), (err?: Error): void => {
+  public updateRoom(ws: WebSocket, response: UpdateRoomResponse): void {
+    const responseString = JSON.stringify({ ...response, data: JSON.stringify(response.data) });
+
+    ws.send(responseString, (err?: Error): void => {
       if (err) console.error(err.message);
     });
-  };
+  }
 }
 
 export default new RoomController();

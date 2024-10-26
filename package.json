@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "start": "webpack && node dist/bundle.js",
-    "start:dev": "ts-node-dev --respawn -- src/index.ts",
+    "start:dev": "nodemon src/index.ts",
     "start:debug": "ts-node-dev --respawn --inspect -- src/index.ts"
   },
   "author": "Siarhei Muliarenka",

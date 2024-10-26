@@ -5,7 +5,6 @@ import { regRoute } from './reg.route';
 import { Message } from '../types/message';
 
 export const routes = (ws: WebSocket, data: Buffer): void => {
-  console.log('data: ', data);
   const message = JSON.parse(data.toString()) as CommonAction;
   const { type: actionType } = message;
   console.log('message: ', message);

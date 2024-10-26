@@ -1,4 +1,4 @@
-import { RoomState } from '../types/api.types';
+import { UpdateRoomResponseData } from '../types/api.types';
 import Guid from '../utils/guid';
 import { User } from './user.types';
 
@@ -6,7 +6,7 @@ class DataService {
   static instance: DataService = new DataService();
 
   private userStorage: User[] = new Array<User>();
-  private roomStorage: RoomState[] = new Array<RoomState>();
+  private roomStorage: UpdateRoomResponseData[] = new Array<UpdateRoomResponseData>();
 
   private constructor() {
     if (!DataService.instance) DataService.instance = this;
@@ -27,7 +27,7 @@ class DataService {
     return { error: false, errorText: '' };
   }
 
-  public getRooms(): RoomState[] {
+  public getRooms(): UpdateRoomResponseData[] {
     return [...this.roomStorage];
   }
 }
