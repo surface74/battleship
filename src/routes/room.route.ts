@@ -3,6 +3,7 @@ import { WebSocket } from 'ws';
 import DataService from '../services/data.service';
 import RoomController from '../controllers/room.controller';
 import { AddUserToRoomRequestData, CommonAction, User } from '../types/api.types';
+import GameController from '../controllers/game.controller';
 
 export const createRoomRoute = (ws: WebSocket): void => {
   const room = DataService.createRoom();
@@ -16,6 +17,8 @@ export const addUserToRoomRoute = (ws: WebSocket, message: CommonAction): void =
   DataService.addUserToRoom(ws, messageData.indexRoom.toString());
 
   updateRoomsForAll();
+
+  GameController.createGame(wcPlayers, datas);
 };
 
 export const updateRoomsForAll = (): void => {

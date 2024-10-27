@@ -3,11 +3,13 @@ import { Room, RoomUser, User, Winner } from '../types/api.types';
 import { CustomError } from '../types/cusom-error.types';
 
 import WebSocket from 'ws';
+import { GameBoard } from './gameboard.types';
 
 class DataService {
   static instance: DataService = new DataService();
   private userStorage: User[] = new Array<User>();
   private roomStorage: Room[] = new Array<Room>();
+  private gameStorage: GameBoard[] = new Array<GameBoard>();
 
   private constructor() {
     if (!DataService.instance) DataService.instance = this;
@@ -15,6 +17,34 @@ class DataService {
 
   public static getInstance(): DataService {
     return DataService.instance;
+  }
+
+  // public createGame(ws: WebSocket) {
+  //   // const gamers: string[] =
+  // }
+
+  getSocketByUserId(id: number | string): WebSocket | undefined {
+    const user = this.userStorage.find((user: User) => user.uuid === id);
+    return user?.ws;
+  }
+
+  public getRoomUsersSockets(ws: WebSocket): (WebSocket | undefined)[] {
+    const user = this.userStorage.find((user: User) => user?.ws === ws);
+    if (user) {
+      let userRoom: Room | undefined;
+      this.roomStorage.forEach((room) => {
+        room.roomUsers.forEach((roomUser) => {
+          if (roomUser.index === user.uuid) userRoom = room;
+        });
+      });
+      if (userRoom) {
+        const sockets = userRoom.roomUsers.map((roomUser: RoomUser) =>
+          this.getSocketByUserId(roomUser.index)
+        );
+        return sockets;
+      }
+    }
+    return new Array<undefined>();
   }
 
   public getWinners(): Winner[] {
