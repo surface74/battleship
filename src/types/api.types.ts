@@ -1,7 +1,4 @@
-export type RoomUser = {
-  name: string;
-  index: number | string;
-};
+import { WebSocket } from 'ws';
 
 export type Ship = {
   position: {
@@ -131,7 +128,20 @@ export interface AddShipsRequest extends CommonAction {
   data: AddShipsRequestData;
 }
 
-export type UpdateRoomResponseData = {
+export type User = {
+  name: string;
+  password: string;
+  wins: number;
+  uuid: string;
+  ws: WebSocket;
+};
+
+export type RoomUser = {
+  name: string;
+  index: number | string;
+};
+
+export type Room = {
   roomId: number | string;
   roomUsers: RoomUser[];
 };
@@ -139,7 +149,7 @@ export type UpdateRoomResponseData = {
 /** Response from back to update list of one player room */
 export interface UpdateRoomResponse extends CommonAction {
   type: ApiMessageType.UpdateRoom;
-  data: UpdateRoomResponseData[];
+  data: Room[];
 }
 
 export interface AddUserToRoomRequestData {

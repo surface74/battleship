@@ -3,6 +3,7 @@ import { WebSocket } from 'ws';
 import { ApiMessageType, CommonAction } from '../types/api.types';
 import { regRoute } from './reg.route';
 import { Message } from '../types/message';
+import { createRoomRoute, addUserToRoomRoute } from './room.route';
 
 export const routes = (ws: WebSocket, data: Buffer): void => {
   const message = JSON.parse(data.toString()) as CommonAction;
@@ -14,8 +15,10 @@ export const routes = (ws: WebSocket, data: Buffer): void => {
       regRoute(ws, message);
       break;
     case ApiMessageType.CreateRoom:
+      createRoomRoute(ws);
       break;
     case ApiMessageType.AddUserToRoom:
+      addUserToRoomRoute(ws, message);
       break;
     case ApiMessageType.AddShips:
       break;

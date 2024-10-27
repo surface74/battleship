@@ -9,7 +9,6 @@ class WinnerController {
       id: 0,
     };
     const responseString = JSON.stringify({ ...response, data: JSON.stringify(response.data) });
-
     ws.send(responseString, (err?: Error): void => {
       if (err) console.error(err.message);
     });

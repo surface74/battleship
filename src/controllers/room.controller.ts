@@ -1,8 +1,8 @@
 import { WebSocket } from 'ws';
-import { ApiMessageType, UpdateRoomResponse, UpdateRoomResponseData } from '../types/api.types';
+import { ApiMessageType, UpdateRoomResponse, Room } from '../types/api.types';
 
 class RoomController {
-  public send(ws: WebSocket, rooms: UpdateRoomResponseData[]): void {
+  public updateRoom(ws: WebSocket, rooms: Room[]): void {
     const response: UpdateRoomResponse = {
       type: ApiMessageType.UpdateRoom,
       data: rooms,
