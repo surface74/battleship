@@ -74,9 +74,8 @@ class DataService {
       isFinish = this.isGameFinish(attackedBoard);
     }
 
-    const isChangePlayerOrder = results.some(
-      (shipState: ShipState) => shipState.state == AttackResult.Miss
-    );
+    const isChangePlayerOrder = results.length === 1 && results[0].state == AttackResult.Miss;
+
     if (isChangePlayerOrder) {
       game.order = !game.order;
     }
@@ -115,7 +114,7 @@ class DataService {
         attackedShip.shipStates.forEach((shipState: ShipState): void => {
           shipState.state = AttackResult.Killed;
           results.push({ ...shipState });
-          results.push(...this.getEmptyPlaceAround());
+          results.push(...this.getEmptyPlaceAround(attackedShip));
         });
       } else {
         results.push({ x, y, state: AttackResult.Shot });
@@ -135,19 +134,37 @@ class DataService {
     return isFinish;
   }
 
-  getEmptyPlaceAround(): ShipState[] {
+  getEmptyPlaceAround(attackedShip: Ship | undefined): ShipState[] {
+    if (!attackedShip) {
+      return new Array<ShipState>();
+    }
+
     const states = new Array<ShipState>();
 
-    // const { position, direction, length } = ship;
-    // const { x, y } = position;
+    const { position, direction, length } = attackedShip;
+    const { x: posX, y: posY } = position;
 
-    // for (let i = 0; i < length; i++) {
-    //   if (direction) {
-    //   } else {
-    //   }
-    // }
+    if (direction) {
+      for (let y = posY - 1; y < posY + length + 1; y++) {
+        states.push({ x: posX - 1, y, state: AttackResult.Miss });
+        states.push({ x: posX + 1, y, state: AttackResult.Miss });
+      }
+      states.push({ x: posX, y: posY - 1, state: AttackResult.Miss });
+      states.push({ x: posX, y: posY + length, state: AttackResult.Miss });
+    } else {
+      for (let x = posX - 1; x < posX + length + 1; x++) {
+        states.push({ x, y: posY - 1, state: AttackResult.Miss });
+        states.push({ x, y: posY + 1, state: AttackResult.Miss });
+      }
+      states.push({ x: posX - 1, y: posY, state: AttackResult.Miss });
+      states.push({ x: posX + length, y: posY, state: AttackResult.Miss });
+    }
 
-    return states;
+    const filtered = states.filter(
+      (state: ShipState) => state.x >= 0 && state.x < 10 && state.y >= 0 && state.y < 10
+    );
+
+    return filtered;
   }
 
   public getPlayerOrder(game: Game): number {
