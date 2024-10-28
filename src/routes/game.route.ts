@@ -11,6 +11,10 @@ import {
 import { GameBoard } from '../services/gameboard.types';
 import { Message } from '../types/message';
 
+export const attackRoute = (ws: WebSocket, message: CommonAction): void => {};
+
+export const randomAttackRoute = (ws: WebSocket, message: CommonAction): void => {};
+
 export const createGameRoute = (ws: WebSocket) => {
   const game = DataService.createGame(ws);
   if (game) {
@@ -28,9 +32,7 @@ export const createGameRoute = (ws: WebSocket) => {
 
 export const addShipsRoute = (ws: WebSocket, message: CommonAction): void => {
   const messageData = JSON.parse(message.data as string) as AddShipsRequestData;
-
   const isGameReadyToStart = DataService.addShipsToGame(messageData);
-  console.log('isGameReadyToStart: ', isGameReadyToStart);
 
   if (isGameReadyToStart) {
     const game = DataService.getGameBySocket(ws);

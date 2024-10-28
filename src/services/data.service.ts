@@ -1,5 +1,14 @@
 import { randomUUID } from 'crypto';
-import { AddShipsRequestData, Room, RoomUser, Ship, User, Winner } from '../types/api.types';
+import {
+  AddShipsRequestData,
+  AttackResult,
+  Room,
+  RoomUser,
+  Ship,
+  ShipState,
+  User,
+  Winner,
+} from '../types/api.types';
 import { CustomError } from '../types/cusom-error.types';
 
 import WebSocket from 'ws';
@@ -64,8 +73,11 @@ class DataService {
     const game = this.gameStorage.find((game: Game) => game.gameId === gameId);
     let isGameReadyToStart = false;
     if (game) {
-      game.gameboards.forEach((gameboard) => {
+      game.gameboards.forEach((gameboard: GameBoard) => {
         if (gameboard.currentPlayerIndex === indexPlayer) {
+          ships.forEach((ship: Ship) => {
+            ship.state = this.addShipState(ship);
+          });
           gameboard.ships = [...ships];
         }
       });
@@ -73,6 +85,30 @@ class DataService {
     }
 
     return isGameReadyToStart;
+  }
+
+  public addShipState(ship: Ship): ShipState[] {
+    const { position, length, direction } = ship;
+    const { x, y } = position;
+
+    const shipState: ShipState[] = new Array<ShipState>();
+    for (let i = 0; i < length; i++) {
+      if (direction) {
+        shipState.push(this.getShipState(x, y + i));
+      } else {
+        shipState.push(this.getShipState(x + i, y));
+      }
+    }
+
+    return shipState;
+  }
+
+  getShipState(x: number, y: number): ShipState {
+    return {
+      x,
+      y,
+      state: AttackResult.None,
+    };
   }
 
   public createGame(ws: WebSocket): Game | null {

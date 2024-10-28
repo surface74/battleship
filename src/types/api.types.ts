@@ -1,4 +1,9 @@
 import { WebSocket } from 'ws';
+export type ShipState = {
+  x: number;
+  y: number;
+  state: AttackResult;
+};
 
 export type Ship = {
   position: {
@@ -8,6 +13,7 @@ export type Ship = {
   direction: boolean;
   length: number;
   type: ShipType;
+  state: ShipState[];
 };
 
 export enum ShipType {
@@ -18,6 +24,7 @@ export enum ShipType {
 }
 
 export enum AttackResult {
+  None = 'none',
   Miss = 'miss',
   Killed = 'killed',
   Shot = 'shot',
