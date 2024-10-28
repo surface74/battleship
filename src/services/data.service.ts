@@ -19,6 +19,34 @@ class DataService {
     return DataService.instance;
   }
 
+  public getGameBySocket(ws: WebSocket): Game | null {
+    const user = this.getUserBySocket(ws);
+    console.log('getGameBySocket.user.uuid: ', user?.uuid);
+
+    if (user) {
+      const game = this.getGameByUser(user);
+      return game;
+    }
+    return null;
+  }
+
+  getGameByUser(user: User): Game | null {
+    const { uuid } = user;
+    let userGame: Game | null = null;
+
+    this.gameStorage.forEach((game: Game) => {
+      for (const board of game.gameboards) {
+        console.log('board.currentPlayerIndex: ', board.currentPlayerIndex);
+        if (board.currentPlayerIndex === uuid) {
+          userGame = game;
+          return;
+        }
+      }
+    });
+
+    return userGame;
+  }
+
   public addShipsToGame(boardData: AddShipsRequestData): boolean {
     const { gameId, ships, indexPlayer } = boardData;
     const game = this.gameStorage.find((game: Game) => game.gameId === gameId);
@@ -29,14 +57,14 @@ class DataService {
           gameboard.ships = [...ships];
         }
       });
-      isGameReadyToStart = game.gameboards.every((board: GameBoard) => !board.ships.length);
+      isGameReadyToStart = game.gameboards.every((board: GameBoard) => board.ships.length > 0);
     }
 
     return isGameReadyToStart;
   }
 
   public createGame(ws: WebSocket): Game | null {
-    const user = this.getUserIdBySocket(ws);
+    const user = this.getUserBySocket(ws);
     if (user) {
       const room = this.getRoomByUser(user);
       if (room) {
@@ -87,7 +115,7 @@ class DataService {
     return user?.ws;
   }
 
-  getUserIdBySocket(ws: WebSocket): User | undefined {
+  getUserBySocket(ws: WebSocket): User | undefined {
     const user = this.userStorage.find((user: User) => user.ws === ws);
     return user;
   }

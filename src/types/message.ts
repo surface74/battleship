@@ -4,4 +4,5 @@ export enum Message {
   BackStart = 'ws-server started on the port',
   BackStop = 'ws-server stoped',
   CantCreateRoom = 'Can`t create room',
+  CantStartGame = 'Can`t start game',
 }
