@@ -41,25 +41,56 @@ class DataService {
       (board: GameBoard) => board.currentPlayerIndex !== indexPlayer
     )[0];
 
-    const attackResult: AttackResult = this.getAttackStatus(attackedBoard);
+    const attackResult: AttackResult = this.getAttackStatus(attackedBoard, x, y);
 
     const response1: AttackResponseData = {
       position: { x, y },
       currentPlayer: indexPlayer,
       status: attackResult,
     };
-    const response2: AttackResponseData = {
-      position: { x, y },
-      currentPlayer: attackedBoard.currentPlayerIndex,
-      status: attackResult,
-    };
 
-    const responses = new Array<AttackResponseData>(response1, response2);
+    const responses = new Array<AttackResponseData>(response1);
+
     return responses;
   }
 
-  getAttackStatus(board: GameBoard): AttackResult {
-    return AttackResult.Killed;
+  getAttackStatus(board: GameBoard, x: number, y: number): AttackResult {
+    let attackedShip: Ship | undefined;
+    let attackResult: AttackResult = AttackResult.Miss;
+    board.ships.forEach((ship: Ship) => {
+      for (const state of ship.state) {
+        if (state.x === x && state.y === y) {
+          attackedShip = ship;
+
+          switch (state.state) {
+            case AttackResult.None:
+              state.state = AttackResult.Shot;
+              attackResult = AttackResult.Shot;
+              break;
+
+            default:
+              break;
+          }
+
+          return;
+        }
+      }
+    });
+
+    if (!attackedShip) {
+      return AttackResult.Miss;
+    } else {
+      const isShipKilled = attackedShip.state.every(
+        (state: ShipState) => state.state !== AttackResult.None
+      );
+      if (isShipKilled) {
+        attackedShip.state.forEach(
+          (state: ShipState): AttackResult => (state.state = AttackResult.Killed)
+        );
+        return AttackResult.Killed;
+      }
+      return AttackResult.Shot;
+    }
   }
 
   public getPlayerOrder(): number {
@@ -89,7 +120,6 @@ class DataService {
 
     this.gameStorage.forEach((game: Game) => {
       for (const board of game.gameboards) {
-        console.log('board.currentPlayerIndex: ', board.currentPlayerIndex);
         if (board.currentPlayerIndex === uuid) {
           userGame = game;
           return;
