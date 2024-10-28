@@ -60,7 +60,7 @@ export const addShipsRoute = (ws: WebSocket, message: CommonAction): void => {
       return;
     }
 
-    const playersOrder = DataService.getPlayerOrder();
+    const playersOrder = DataService.getPlayerOrder(game);
     game.gameboards.forEach(({ ships, currentPlayerIndex, ws }) => {
       const startData: StartGameResponseData = {
         ships,

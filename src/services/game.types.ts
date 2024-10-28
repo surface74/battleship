@@ -4,6 +4,7 @@ import { Ship } from '../types/api.types';
 export interface Game {
   gameId: string;
   gameboards: GameBoard[];
+  order: boolean;
 }
 
 export interface GameBoard {

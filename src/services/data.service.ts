@@ -19,7 +19,6 @@ import { Message } from '../types/message';
 class DataService {
   static instance: DataService = new DataService();
 
-  private playersOrder: number | null = null;
   private userStorage: User[] = new Array<User>();
   private roomStorage: Room[] = new Array<Room>();
   private gameStorage: Game[] = new Array<Game>();
@@ -38,6 +37,11 @@ class DataService {
     const game = this.gameStorage.filter(
       (game: Game): boolean => game.gameId === gameId.toString()
     )[0];
+
+    const order = this.getPlayerOrder(game);
+    if (game.gameboards[order].currentPlayerIndex !== indexPlayer) {
+      return [new Array<WebSocket>(), new Array<ShipState>()];
+    }
 
     const sockets: WebSocket[] = game.gameboards.map((board: GameBoard): WebSocket => board.ws);
 
@@ -108,14 +112,8 @@ class DataService {
     return states;
   }
 
-  public getPlayerOrder(): number {
-    if (this.playersOrder == null) {
-      this.playersOrder = Math.random() > 0.5 ? 1 : 0;
-    } else {
-      this.playersOrder = this.playersOrder ? 0 : 1;
-    }
-
-    return this.playersOrder;
+  public getPlayerOrder(game: Game): number {
+    return game.order ? 0 : 1;
   }
 
   public getGameBySocket(ws: WebSocket): Game | null {
@@ -220,6 +218,7 @@ class DataService {
     const game: Game = {
       gameId: randomUUID(),
       gameboards: [...gameBoards],
+      order: Math.random() > 0.5,
     };
     return game;
   }
