@@ -1,9 +1,9 @@
 import { WebSocket } from 'ws';
-import { ApiMessageType, CreateGameResponseData } from '../types/api.types';
+import { ApiMessageType, CreateGameResponse, CreateGameResponseData } from '../types/api.types';
 
 class GameController {
-  public createGame(wcPlayers: WebSocket[], data: CreateGameResponseData[]): void {
-    const response: CreateGameResponseData = {
+  public createGame(ws: WebSocket, data: CreateGameResponseData): void {
+    const response: CreateGameResponse = {
       type: ApiMessageType.CreateGame,
       data,
       id: 0,
@@ -11,11 +11,9 @@ class GameController {
 
     const responseString = JSON.stringify({ ...response, data: JSON.stringify(response.data) });
 
-    wcPlayers.forEach((ws: WebSocket): void =>
-      ws.send(responseString, (err?: Error): void => {
-        if (err) console.error(err.message);
-      })
-    );
+    ws.send(responseString, (err?: Error): void => {
+      if (err) console.error(err.message);
+    });
   }
 }
 

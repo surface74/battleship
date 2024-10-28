@@ -1,15 +1,15 @@
 import { randomUUID } from 'crypto';
-import { Room, RoomUser, User, Winner } from '../types/api.types';
+import { Room, RoomUser, Ship, User, Winner } from '../types/api.types';
 import { CustomError } from '../types/cusom-error.types';
 
 import WebSocket from 'ws';
-import { GameBoard } from './gameboard.types';
+import { Game, GameBoard } from './gameboard.types';
 
 class DataService {
   static instance: DataService = new DataService();
   private userStorage: User[] = new Array<User>();
   private roomStorage: Room[] = new Array<Room>();
-  private gameStorage: GameBoard[] = new Array<GameBoard>();
+  private gameStorage: Game[] = new Array<Game>();
 
   private constructor() {
     if (!DataService.instance) DataService.instance = this;
@@ -19,13 +19,61 @@ class DataService {
     return DataService.instance;
   }
 
-  // public createGame(ws: WebSocket) {
-  //   // const gamers: string[] =
-  // }
+  public createGame(ws: WebSocket): Game | null {
+    const user = this.getUserIdBySocket(ws);
+    if (user) {
+      const room = this.getRoomByUser(user);
+      if (room) {
+        const game = this.getNewGame(room);
+        if (game) {
+          this.gameStorage.push(game);
+          return game;
+        }
+      }
+    }
+    return null;
+  }
+
+  getNewGame(room: Room): Game | null {
+    const gameBoards = new Array<GameBoard>();
+    for (const roomUser of room.roomUsers) {
+      const ws = this.getSocketByUserId(roomUser.index);
+      if (!ws) {
+        return null;
+      }
+      const board: GameBoard = {
+        currentPlayerIndex: roomUser.index.toString(),
+        ships: new Array<Ship>(),
+        ws,
+      };
+      gameBoards.push(board);
+    }
+    const game: Game = {
+      gameId: randomUUID(),
+      gameboards: [...gameBoards],
+    };
+    return game;
+  }
+
+  getRoomByUser(user: User): Room | undefined {
+    let userRoom: Room | undefined;
+    this.roomStorage.forEach((room) => {
+      room.roomUsers.forEach((roomUser) => {
+        if (roomUser.index === user.uuid) userRoom = room;
+      });
+    });
+
+    return userRoom;
+  }
 
   getSocketByUserId(id: number | string): WebSocket | undefined {
     const user = this.userStorage.find((user: User) => user.uuid === id);
     return user?.ws;
+  }
+
+  getUserIdBySocket(ws: WebSocket): User | undefined {
+    const user = this.userStorage.find((user: User) => user.ws === ws);
+    return user;
   }
 
   public getRoomUsersSockets(ws: WebSocket): (WebSocket | undefined)[] {

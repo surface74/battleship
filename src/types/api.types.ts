@@ -175,7 +175,7 @@ export interface CreateGameResponseData {
 }
 
 /** Response from back after create game */
-export interface CreateRoomResponse extends CommonAction {
+export interface CreateGameResponse extends CommonAction {
   type: ApiMessageType.CreateGame;
   data: CreateGameResponseData;
 }
