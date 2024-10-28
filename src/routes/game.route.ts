@@ -7,10 +7,12 @@ import {
   AttackResponseData,
   CommonAction,
   CreateGameResponseData,
+  FinishResponseData,
   RandomAttackRequestData,
   ShipState,
   StartGameResponseData,
   TurnResponseData,
+  User,
 } from '../types/api.types';
 import { GameBoard } from '../services/game.types';
 import { Message } from '../types/message';
@@ -18,8 +20,7 @@ import { random } from '../utils/random';
 
 export const attackRoute = (ws: WebSocket, messageData: AttackRequestData): void => {
   const { indexPlayer } = messageData;
-  const [sockets, results, nextPlayerId] = DataService.getAttackResult(messageData);
-  console.log('nextPlayerId: ', nextPlayerId);
+  const [sockets, results, nextPlayerId, isFinish] = DataService.getAttackResult(messageData);
 
   results.forEach((result: ShipState) => {
     const { x, y, state: status } = result;
@@ -32,10 +33,39 @@ export const attackRoute = (ws: WebSocket, messageData: AttackRequestData): void
     sockets.forEach((ws: WebSocket) => GameController.sendAttackResult(ws, response));
   });
 
-  const turnData: TurnResponseData = {
-    currentPlayer: nextPlayerId,
-  };
-  sockets.forEach((ws: WebSocket) => GameController.turn(ws, turnData));
+  if (isFinish) {
+    finishGame(sockets, indexPlayer);
+  } else {
+    const turnData: TurnResponseData = {
+      currentPlayer: nextPlayerId,
+    };
+    sockets.forEach((ws: WebSocket): void => GameController.turn(ws, turnData));
+  }
+};
+
+const finishGame = (sockets: WebSocket[], playerId: string | number): void => {
+  const user = DataService.getUserById(playerId);
+
+  if (user) {
+    DataService.increaseWinCount(user.uuid);
+
+    const finishData: FinishResponseData = { winPlayer: user.uuid };
+
+    sockets.forEach((ws: WebSocket) => {
+      GameController.finishGame(ws, finishData);
+    });
+  }
+
+  updateWinners();
+};
+
+const updateWinners = () => {
+  const activeUsers: User[] = DataService.getActiveUsers();
+  console.log('activeUsers: ', activeUsers.length);
+  const winners = DataService.getWinners();
+  console.log('winners: ', winners);
+
+  activeUsers.forEach((user: User): void => GameController.updateWinner(user.ws, winners));
 };
 
 export const randomAttackRoute = (ws: WebSocket, data: RandomAttackRequestData): void => {

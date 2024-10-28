@@ -3,7 +3,7 @@ import { CommonAction, RegRequestData, Room, RegResponseData, User } from '../ty
 import DataService from '../services/data.service';
 import RegController from '../controllers/reg.controller';
 import RoomController from '../controllers/room.controller';
-import WinnerController from '../controllers/winner.controller';
+import GameController from '../controllers/game.controller';
 
 export const regRoute = (ws: WebSocket, message: CommonAction): void => {
   const messageData = JSON.parse(message.data as string) as RegRequestData;
@@ -19,7 +19,7 @@ export const regRoute = (ws: WebSocket, message: CommonAction): void => {
 
     activeUsers.forEach((user: User): void => {
       RoomController.updateRoom(user.ws, rooms);
-      WinnerController.send(user.ws, winners);
+      GameController.updateWinner(user.ws, winners);
     });
   } else {
     console.error(errorText);

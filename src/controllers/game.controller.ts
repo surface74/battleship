@@ -5,13 +5,45 @@ import {
   AttackResponseData,
   CreateGameResponse,
   CreateGameResponseData,
+  FinishResponse,
+  FinishResponseData,
   StartGameResponse,
   StartGameResponseData,
   TurnResponse,
   TurnResponseData,
+  Winner,
+  WinnersResponse,
 } from '../types/api.types';
 
 class GameController {
+  public updateWinner(ws: WebSocket, winners: Winner[]): void {
+    const response: WinnersResponse = {
+      type: ApiMessageType.UpdateWinners,
+      data: winners,
+      id: 0,
+    };
+
+    const responseString = JSON.stringify({ ...response, data: JSON.stringify(response.data) });
+
+    ws.send(responseString, (err?: Error): void => {
+      if (err) console.error(err.message);
+    });
+  }
+
+  public finishGame(ws: WebSocket, data: FinishResponseData): void {
+    const response: FinishResponse = {
+      type: ApiMessageType.Finish,
+      data,
+      id: 0,
+    };
+
+    const responseString = JSON.stringify({ ...response, data: JSON.stringify(response.data) });
+
+    ws.send(responseString, (err?: Error): void => {
+      if (err) console.error(err.message);
+    });
+  }
+
   public sendAttackResult(ws: WebSocket, data: AttackResponseData): void {
     const response: AttackResponse = {
       type: ApiMessageType.Attack,

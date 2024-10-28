@@ -31,8 +31,24 @@ class DataService {
     return DataService.instance;
   }
 
-  public getAttackResult(data: AttackRequestData): [WebSocket[], ShipState[], string | number] {
+  public increaseWinCount(playerId: string) {
+    const user = this.getUserById(playerId);
+    if (user) {
+      user.wins += 1;
+    }
+  }
+
+  public getUserById(id: string | number): User | undefined {
+    const user = this.userStorage.find((user: User) => user.uuid === id);
+    return user;
+  }
+
+  public getAttackResult(
+    data: AttackRequestData
+  ): [WebSocket[], ShipState[], string | number, boolean] {
     const { gameId, x, y, indexPlayer } = data;
+
+    let isFinish = false;
 
     const game = this.gameStorage.filter(
       (game: Game): boolean => game.gameId === gameId.toString()
@@ -40,7 +56,7 @@ class DataService {
 
     const order = this.getPlayerOrder(game);
     if (game.gameboards[order].currentPlayerIndex !== indexPlayer) {
-      return [new Array<WebSocket>(), new Array<ShipState>(), ''];
+      return [new Array<WebSocket>(), new Array<ShipState>(), '', false];
     }
 
     const sockets: WebSocket[] = game.gameboards.map((board: GameBoard): WebSocket => board.ws);
@@ -51,14 +67,22 @@ class DataService {
 
     const results: ShipState[] = this.getAttackStatus(attackedBoard, x, y);
 
+    const isNeedCheckFinish = results.some(
+      (shipState: ShipState) => shipState.state == AttackResult.Killed
+    );
+    if (isNeedCheckFinish) {
+      isFinish = this.isGameFinish(attackedBoard);
+    }
+
     const isChangePlayerOrder = results.some(
       (shipState: ShipState) => shipState.state == AttackResult.Miss
     );
     if (isChangePlayerOrder) {
       game.order = !game.order;
     }
+
     const nextPlayerId = game.gameboards[this.getPlayerOrder(game)].currentPlayerIndex;
-    return [sockets, results, nextPlayerId];
+    return [sockets, results, nextPlayerId, isFinish];
   }
 
   getAttackStatus(board: GameBoard, x: number, y: number): ShipState[] {
@@ -101,6 +125,14 @@ class DataService {
     }
 
     return results;
+  }
+
+  isGameFinish(board: GameBoard) {
+    const isFinish = board.ships.every((ship: Ship) => {
+      return true;
+    });
+
+    return isFinish;
   }
 
   getEmptyPlaceAround(): ShipState[] {
@@ -269,13 +301,13 @@ class DataService {
   }
 
   public getWinners(): Winner[] {
-    this.userStorage
+    const winners = this.userStorage
       .filter((user: User): boolean => user.wins > 0)
       .sort((a: User, b: User): number => a.wins - b.wins)
       .map(({ name, wins }: User): Winner => {
         return { name, wins };
       });
-    return new Array<Winner>();
+    return winners;
   }
 
   public getState(): string {
