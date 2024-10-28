@@ -17,7 +17,7 @@ import { Message } from '../types/message';
 export const attackRoute = (ws: WebSocket, message: CommonAction): void => {
   const messageData = JSON.parse(message.data as string) as AttackRequestData;
   const { indexPlayer } = messageData;
-  const [sockets, results] = DataService.getAttackResult(messageData);
+  const [sockets, results, nextPlayerId] = DataService.getAttackResult(messageData);
 
   results.forEach((result: ShipState) => {
     const { x, y, state: status } = result;
@@ -29,6 +29,11 @@ export const attackRoute = (ws: WebSocket, message: CommonAction): void => {
 
     sockets.forEach((ws: WebSocket) => GameController.sendAttackResult(ws, response));
   });
+
+  const turnData: TurnResponseData = {
+    currentPlayer: nextPlayerId,
+  };
+  GameController.turn(ws, turnData);
 };
 
 export const randomAttackRoute = (ws: WebSocket, message: CommonAction): void => {};
@@ -60,14 +65,14 @@ export const addShipsRoute = (ws: WebSocket, message: CommonAction): void => {
       return;
     }
 
-    const playersOrder = DataService.getPlayerOrder(game);
-    game.gameboards.forEach(({ ships, currentPlayerIndex, ws }) => {
+    game.gameboards.forEach(({ ships, currentPlayerIndex, ws }: GameBoard) => {
       const startData: StartGameResponseData = {
         ships,
         currentPlayerIndex,
       };
       GameController.startGame(ws, startData);
 
+      const playersOrder = DataService.getPlayerOrder(game);
       const turnData: TurnResponseData = {
         currentPlayer: game.gameboards[playersOrder].currentPlayerIndex,
       };

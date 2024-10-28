@@ -9,7 +9,6 @@ import { addShipsRoute, attackRoute, randomAttackRoute } from './game.route';
 export const routes = (ws: WebSocket, data: Buffer): void => {
   const message = JSON.parse(data.toString()) as CommonAction;
   const { type: actionType } = message;
-  console.log('message: ', message);
 
   switch (actionType) {
     case ApiMessageType.Reg:
@@ -36,5 +35,5 @@ export const routes = (ws: WebSocket, data: Buffer): void => {
       break;
   }
 
-  console.log('received: %s', data);
+  // console.log('received: %s', data);
 };

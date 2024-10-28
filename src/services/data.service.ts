@@ -31,7 +31,7 @@ class DataService {
     return DataService.instance;
   }
 
-  public getAttackResult(data: AttackRequestData): [WebSocket[], ShipState[]] {
+  public getAttackResult(data: AttackRequestData): [WebSocket[], ShipState[], string | number] {
     const { gameId, x, y, indexPlayer } = data;
 
     const game = this.gameStorage.filter(
@@ -40,7 +40,7 @@ class DataService {
 
     const order = this.getPlayerOrder(game);
     if (game.gameboards[order].currentPlayerIndex !== indexPlayer) {
-      return [new Array<WebSocket>(), new Array<ShipState>()];
+      return [new Array<WebSocket>(), new Array<ShipState>(), ''];
     }
 
     const sockets: WebSocket[] = game.gameboards.map((board: GameBoard): WebSocket => board.ws);
@@ -50,9 +50,15 @@ class DataService {
     )[0];
 
     const results: ShipState[] = this.getAttackStatus(attackedBoard, x, y);
-    console.log('results: ', results);
 
-    return [sockets, results];
+    const isChangePlayerOrder = results.some(
+      (shipState: ShipState) => shipState.state == AttackResult.Miss
+    );
+    if (isChangePlayerOrder) {
+      game.order = !game.order;
+    }
+    const nextPlayerId = game.gameboards[this.getPlayerOrder(game)].currentPlayerIndex;
+    return [sockets, results, nextPlayerId];
   }
 
   getAttackStatus(board: GameBoard, x: number, y: number): ShipState[] {
@@ -118,7 +124,6 @@ class DataService {
 
   public getGameBySocket(ws: WebSocket): Game | null {
     const user = this.getUserBySocket(ws);
-    console.log('getGameBySocket.user.uuid: ', user?.uuid);
 
     if (user) {
       const game = this.getGameByUser(user);
