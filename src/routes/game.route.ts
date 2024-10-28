@@ -3,6 +3,8 @@ import DataService from '../services/data.service';
 import GameController from '../controllers/game.controller';
 import {
   AddShipsRequestData,
+  AttackRequestData,
+  AttackResponseData,
   CommonAction,
   CreateGameResponseData,
   StartGameResponseData,
@@ -11,7 +13,14 @@ import {
 import { GameBoard } from '../services/gameboard.types';
 import { Message } from '../types/message';
 
-export const attackRoute = (ws: WebSocket, message: CommonAction): void => {};
+export const attackRoute = (ws: WebSocket, message: CommonAction): void => {
+  const messageData = JSON.parse(message.data as string) as AttackRequestData;
+  const responses: AttackResponseData[] = DataService.getAttackResult(messageData);
+
+  responses.forEach((response: AttackResponseData) =>
+    GameController.sendAttackResult(ws, response)
+  );
+};
 
 export const randomAttackRoute = (ws: WebSocket, message: CommonAction): void => {};
 
@@ -32,6 +41,7 @@ export const createGameRoute = (ws: WebSocket) => {
 
 export const addShipsRoute = (ws: WebSocket, message: CommonAction): void => {
   const messageData = JSON.parse(message.data as string) as AddShipsRequestData;
+
   const isGameReadyToStart = DataService.addShipsToGame(messageData);
 
   if (isGameReadyToStart) {

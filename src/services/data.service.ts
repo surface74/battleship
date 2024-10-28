@@ -1,6 +1,8 @@
 import { randomUUID } from 'crypto';
 import {
   AddShipsRequestData,
+  AttackRequestData,
+  AttackResponseData,
   AttackResult,
   Room,
   RoomUser,
@@ -28,6 +30,36 @@ class DataService {
 
   public static getInstance(): DataService {
     return DataService.instance;
+  }
+
+  public getAttackResult(data: AttackRequestData): AttackResponseData[] {
+    const { gameId, x, y, indexPlayer } = data;
+
+    const game = this.gameStorage.filter((game: Game) => game.gameId === gameId)[0];
+
+    const attackedBoard = game.gameboards.filter(
+      (board: GameBoard) => board.currentPlayerIndex !== indexPlayer
+    )[0];
+
+    const attackResult: AttackResult = this.getAttackStatus(attackedBoard);
+
+    const response1: AttackResponseData = {
+      position: { x, y },
+      currentPlayer: indexPlayer,
+      status: attackResult,
+    };
+    const response2: AttackResponseData = {
+      position: { x, y },
+      currentPlayer: attackedBoard.currentPlayerIndex,
+      status: attackResult,
+    };
+
+    const responses = new Array<AttackResponseData>(response1, response2);
+    return responses;
+  }
+
+  getAttackStatus(board: GameBoard): AttackResult {
+    return AttackResult.Killed;
   }
 
   public getPlayerOrder(): number {

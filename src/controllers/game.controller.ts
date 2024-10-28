@@ -1,6 +1,8 @@
 import { WebSocket } from 'ws';
 import {
   ApiMessageType,
+  AttackResponse,
+  AttackResponseData,
   CreateGameResponse,
   CreateGameResponseData,
   StartGameResponse,
@@ -10,6 +12,20 @@ import {
 } from '../types/api.types';
 
 class GameController {
+  public sendAttackResult(ws: WebSocket, data: AttackResponseData): void {
+    const response: AttackResponse = {
+      type: ApiMessageType.Attack,
+      data,
+      id: 0,
+    };
+
+    const responseString = JSON.stringify({ ...response, data: JSON.stringify(response.data) });
+
+    ws.send(responseString, (err?: Error): void => {
+      if (err) console.error(err.message);
+    });
+  }
+
   public turn(ws: WebSocket, data: TurnResponseData): void {
     const response: TurnResponse = {
       type: ApiMessageType.Turn,
