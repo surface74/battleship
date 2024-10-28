@@ -61,9 +61,7 @@ const finishGame = (sockets: WebSocket[], playerId: string | number): void => {
 
 const updateWinners = () => {
   const activeUsers: User[] = DataService.getActiveUsers();
-  console.log('activeUsers: ', activeUsers.length);
   const winners = DataService.getWinners();
-  console.log('winners: ', winners);
 
   activeUsers.forEach((user: User): void => GameController.updateWinner(user.ws, winners));
 };

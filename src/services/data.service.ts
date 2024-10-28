@@ -127,10 +127,10 @@ class DataService {
     return results;
   }
 
-  isGameFinish(board: GameBoard) {
-    const isFinish = board.ships.every((ship: Ship) => {
-      return true;
-    });
+  isGameFinish(board: GameBoard): boolean {
+    const isFinish = board.ships.every(
+      (ship: Ship): boolean => ship.shipStates[0].state === AttackResult.Killed
+    );
 
     return isFinish;
   }
