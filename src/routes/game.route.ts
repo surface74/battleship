@@ -7,6 +7,7 @@ import {
   AttackResponseData,
   CommonAction,
   CreateGameResponseData,
+  ShipState,
   StartGameResponseData,
   TurnResponseData,
 } from '../types/api.types';
@@ -15,9 +16,19 @@ import { Message } from '../types/message';
 
 export const attackRoute = (ws: WebSocket, message: CommonAction): void => {
   const messageData = JSON.parse(message.data as string) as AttackRequestData;
-  const [sockets, response] = DataService.getAttackResult(messageData);
+  const { indexPlayer } = messageData;
+  const [sockets, results] = DataService.getAttackResult(messageData);
 
-  sockets.forEach((ws: WebSocket) => GameController.sendAttackResult(ws, response));
+  results.forEach((result: ShipState) => {
+    const { x, y, state: status } = result;
+    const response: AttackResponseData = {
+      position: { x, y },
+      currentPlayer: indexPlayer,
+      status,
+    };
+
+    sockets.forEach((ws: WebSocket) => GameController.sendAttackResult(ws, response));
+  });
 };
 
 export const randomAttackRoute = (ws: WebSocket, message: CommonAction): void => {};
