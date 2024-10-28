@@ -1,20 +1,40 @@
 {
-    "name": "battleship",
-    "version": "1.0.0",
-    "description": "Back for the Battleship game",
-    "main": "index.js",
-    "type": "module",
-    "scripts": {
-        "start": "node ./index.js",
-        "start:dev": "nodemon ./index.js"
-    },
-    "author": "Siarhei Muliarenka",
-    "keywords": [],
-    "license": "ISC",
-    "devDependencies": {
-        "nodemon": "^3.1.7"
-    },
-    "dependencies": {
-        "ws": "^8.18.0"
-    }
+  "name": "battleship",
+  "version": "1.0.0",
+  "description": "Back for the Battleship game",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "webpack && node dist/bundle.js",
+    "start:dev": "nodemon src/index.ts",
+    "start:debug": "ts-node-dev --respawn --inspect -- src/index.ts"
+  },
+  "author": "Siarhei Muliarenka",
+  "keywords": [],
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@types/jest": "^29.5.13",
+    "@types/node": "^22.7.9",
+    "@types/supertest": "^6.0.2",
+    "@types/uuid": "^10.0.0",
+    "@types/ws": "^8.5.12",
+    "@typescript-eslint/eslint-plugin": "^8.11.0",
+    "@typescript-eslint/parser": "^8.11.0",
+    "eslint": "^9.13.0",
+    "nodemon": "^3.1.7",
+    "prettier": "^3.3.3",
+    "ts-jest": "^29.2.5",
+    "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.11.0",
+    "webpack": "^5.95.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ws": "^8.18.0"
+  }
 }
