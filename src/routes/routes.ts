@@ -1,6 +1,11 @@
 import { WebSocket } from 'ws';
 
-import { ApiMessageType, CommonAction } from '../types/api.types';
+import {
+  ApiMessageType,
+  AttackRequestData,
+  CommonAction,
+  RandomAttackRequestData,
+} from '../types/api.types';
 import { regRoute } from './reg.route';
 import { Message } from '../types/message';
 import { createRoomRoute, addUserToRoomRoute } from './room.route';
@@ -24,10 +29,10 @@ export const routes = (ws: WebSocket, data: Buffer): void => {
       addShipsRoute(ws, message);
       break;
     case ApiMessageType.Attack:
-      attackRoute(ws, message);
+      attackRoute(ws, JSON.parse(message.data as string) as AttackRequestData);
       break;
     case ApiMessageType.RandomAttack:
-      randomAttackRoute(ws, message);
+      randomAttackRoute(ws, JSON.parse(message.data as string) as RandomAttackRequestData);
       break;
 
     default:
@@ -35,5 +40,5 @@ export const routes = (ws: WebSocket, data: Buffer): void => {
       break;
   }
 
-  // console.log('received: %s', data);
+  console.log('received: %s', data);
 };
