@@ -5,4 +5,5 @@ export enum Message {
   BackStop = 'ws-server stoped',
   CantCreateRoom = 'Can`t create room',
   CantStartGame = 'Can`t start game',
+  CantAddUserToRoom = 'Can`t add user to room',
 }

@@ -14,6 +14,7 @@ import { CustomError } from '../types/cusom-error.types';
 
 import WebSocket from 'ws';
 import { BoardResult, Game, GameBoard } from './game.types';
+import { Message } from '../types/message';
 
 class DataService {
   static instance: DataService = new DataService();
@@ -80,6 +81,7 @@ class DataService {
         attackedShip.shipStates.forEach((shipState: ShipState): void => {
           shipState.state = AttackResult.Killed;
           results.push({ ...shipState });
+          results.push(...this.getEmptyPlaceAround(attackedShip as Ship));
         });
       } else {
         results.push({ x, y, state: AttackResult.Shot });
@@ -89,6 +91,21 @@ class DataService {
     }
 
     return results;
+  }
+
+  getEmptyPlaceAround(ship: Ship): ShipState[] {
+    const states = new Array<ShipState>();
+
+    const { position, direction, length } = ship;
+    const { x, y } = position;
+
+    for (let i = 0; i < length; i++) {
+      if (direction) {
+      } else {
+      }
+    }
+
+    return states;
   }
 
   public getPlayerOrder(): number {
@@ -272,12 +289,13 @@ class DataService {
     const room = this.roomStorage.find((room: Room): boolean => room.roomId === indexRoom);
     const user = this.userStorage.find((user: User): boolean => user.ws === ws);
 
-    if (room && user) {
+    if (room && user && room.roomUsers.length < 2 && room.roomUsers[0]?.index != user.uuid) {
       room.roomUsers.push({ name: user.name, index: user.uuid });
       return { error: false, errorText: '' };
     }
-    return { error: true, errorText: 'Room or user not found' };
+    return { error: true, errorText: Message.CantAddUserToRoom };
   }
+
   public createRoom(): Room {
     const room: Room = {
       roomId: randomUUID(),

@@ -15,11 +15,14 @@ export const createRoomRoute = (ws: WebSocket): void => {
 
 export const addUserToRoomRoute = (ws: WebSocket, message: CommonAction): void => {
   const messageData = JSON.parse(message.data as string) as AddUserToRoomRequestData;
-  DataService.addUserToRoom(ws, messageData.indexRoom.toString());
+  const customError = DataService.addUserToRoom(ws, messageData.indexRoom.toString());
 
-  updateRoomsForAll();
-
-  createGameRoute(ws);
+  if (!customError.error) {
+    updateRoomsForAll();
+    createGameRoute(ws);
+  } else {
+    console.warn(customError.errorText);
+  }
 };
 
 export const updateRoomsForAll = (): void => {
