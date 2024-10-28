@@ -11,3 +11,9 @@ export interface GameBoard {
   currentPlayerIndex: number | string;
   ws: WebSocket;
 }
+
+export interface BoardResult {
+  x: number;
+  y: number;
+  state: AttackResult;
+}

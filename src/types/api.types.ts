@@ -13,7 +13,7 @@ export type Ship = {
   direction: boolean;
   length: number;
   type: ShipType;
-  state: ShipState[];
+  shipStates: ShipState[];
 };
 
 export enum ShipType {

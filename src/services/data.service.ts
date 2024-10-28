@@ -14,7 +14,7 @@ import {
 import { CustomError } from '../types/cusom-error.types';
 
 import WebSocket from 'ws';
-import { Game, GameBoard } from './gameboard.types';
+import { Game, GameBoard } from './game.types';
 
 class DataService {
   static instance: DataService = new DataService();
@@ -32,44 +32,42 @@ class DataService {
     return DataService.instance;
   }
 
-  public getAttackResult(data: AttackRequestData): AttackResponseData[] {
+  public getAttackResult(data: AttackRequestData): [WebSocket[], AttackResponseData] {
     const { gameId, x, y, indexPlayer } = data;
 
-    const game = this.gameStorage.filter((game: Game) => game.gameId === gameId)[0];
+    const game = this.gameStorage.filter(
+      (game: Game): boolean => game.gameId === gameId.toString()
+    )[0];
 
+    const sockets: WebSocket[] = game.gameboards.map((board: GameBoard): WebSocket => board.ws);
     const attackedBoard = game.gameboards.filter(
       (board: GameBoard) => board.currentPlayerIndex !== indexPlayer
     )[0];
 
     const attackResult: AttackResult = this.getAttackStatus(attackedBoard, x, y);
 
-    const response1: AttackResponseData = {
+    const response: AttackResponseData = {
       position: { x, y },
       currentPlayer: indexPlayer,
       status: attackResult,
     };
 
-    const responses = new Array<AttackResponseData>(response1);
-
-    return responses;
+    return [sockets, response];
   }
 
   getAttackStatus(board: GameBoard, x: number, y: number): AttackResult {
     let attackedShip: Ship | undefined;
-    let attackResult: AttackResult = AttackResult.Miss;
+    let attackResult = AttackResult.Miss;
+
     board.ships.forEach((ship: Ship) => {
-      for (const state of ship.state) {
-        if (state.x === x && state.y === y) {
+      for (const shipState of ship.shipStates) {
+        if (shipState.x === x && shipState.y === y) {
           attackedShip = ship;
-
-          switch (state.state) {
-            case AttackResult.None:
-              state.state = AttackResult.Shot;
-              attackResult = AttackResult.Shot;
-              break;
-
-            default:
-              break;
+          if (shipState.state === AttackResult.None) {
+            shipState.state = AttackResult.Shot;
+            attackResult = AttackResult.Shot;
+          } else {
+            attackResult = shipState.state;
           }
 
           return;
@@ -77,20 +75,21 @@ class DataService {
       }
     });
 
-    if (!attackedShip) {
-      return AttackResult.Miss;
-    } else {
-      const isShipKilled = attackedShip.state.every(
-        (state: ShipState) => state.state !== AttackResult.None
+    if (attackedShip && attackResult == <AttackResult>AttackResult.Shot) {
+      const isShipKilled = attackedShip.shipStates.every(
+        (shipState: ShipState) => shipState.state === AttackResult.Shot
       );
+
       if (isShipKilled) {
-        attackedShip.state.forEach(
-          (state: ShipState): AttackResult => (state.state = AttackResult.Killed)
+        attackedShip.shipStates.forEach(
+          (shipState: ShipState): AttackResult => (shipState.state = AttackResult.Killed)
         );
         return AttackResult.Killed;
       }
       return AttackResult.Shot;
     }
+
+    return attackResult;
   }
 
   public getPlayerOrder(): number {
@@ -138,7 +137,7 @@ class DataService {
       game.gameboards.forEach((gameboard: GameBoard) => {
         if (gameboard.currentPlayerIndex === indexPlayer) {
           ships.forEach((ship: Ship) => {
-            ship.state = this.addShipState(ship);
+            ship.shipStates = this.addShipState(ship);
           });
           gameboard.ships = [...ships];
         }

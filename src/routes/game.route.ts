@@ -10,16 +10,14 @@ import {
   StartGameResponseData,
   TurnResponseData,
 } from '../types/api.types';
-import { GameBoard } from '../services/gameboard.types';
+import { GameBoard } from '../services/game.types';
 import { Message } from '../types/message';
 
 export const attackRoute = (ws: WebSocket, message: CommonAction): void => {
   const messageData = JSON.parse(message.data as string) as AttackRequestData;
-  const responses: AttackResponseData[] = DataService.getAttackResult(messageData);
+  const [sockets, response] = DataService.getAttackResult(messageData);
 
-  responses.forEach((response: AttackResponseData) =>
-    GameController.sendAttackResult(ws, response)
-  );
+  sockets.forEach((ws: WebSocket) => GameController.sendAttackResult(ws, response));
 };
 
 export const randomAttackRoute = (ws: WebSocket, message: CommonAction): void => {};
