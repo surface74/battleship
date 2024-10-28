@@ -6,6 +6,7 @@ import {
   CommonAction,
   CreateGameResponseData,
   StartGameResponseData,
+  TurnResponseData,
 } from '../types/api.types';
 import { GameBoard } from '../services/gameboard.types';
 import { Message } from '../types/message';
@@ -33,16 +34,23 @@ export const addShipsRoute = (ws: WebSocket, message: CommonAction): void => {
 
   if (isGameReadyToStart) {
     const game = DataService.getGameBySocket(ws);
-    if (game) {
-      game.gameboards.forEach(({ ships, currentPlayerIndex, ws }) => {
-        const data: StartGameResponseData = {
-          ships,
-          currentPlayerIndex,
-        };
-        GameController.startGame(ws, data);
-      });
-    } else {
+    if (!game) {
       console.warn(Message.CantStartGame);
+      return;
     }
+
+    const playersOrder = DataService.getPlayerOrder();
+    game.gameboards.forEach(({ ships, currentPlayerIndex, ws }) => {
+      const startData: StartGameResponseData = {
+        ships,
+        currentPlayerIndex,
+      };
+      GameController.startGame(ws, startData);
+
+      const turnData: TurnResponseData = {
+        currentPlayer: game.gameboards[playersOrder].currentPlayerIndex,
+      };
+      GameController.turn(ws, turnData);
+    });
   }
 };

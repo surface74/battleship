@@ -7,6 +7,8 @@ import { Game, GameBoard } from './gameboard.types';
 
 class DataService {
   static instance: DataService = new DataService();
+
+  private playersOrder: number | null = null;
   private userStorage: User[] = new Array<User>();
   private roomStorage: Room[] = new Array<Room>();
   private gameStorage: Game[] = new Array<Game>();
@@ -17,6 +19,16 @@ class DataService {
 
   public static getInstance(): DataService {
     return DataService.instance;
+  }
+
+  public getPlayerOrder(): number {
+    if (this.playersOrder == null) {
+      this.playersOrder = Math.random() > 0.5 ? 1 : 0;
+    } else {
+      this.playersOrder = this.playersOrder ? 0 : 1;
+    }
+
+    return this.playersOrder;
   }
 
   public getGameBySocket(ws: WebSocket): Game | null {
