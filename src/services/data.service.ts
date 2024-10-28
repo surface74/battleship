@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { Room, RoomUser, Ship, User, Winner } from '../types/api.types';
+import { AddShipsRequestData, Room, RoomUser, Ship, User, Winner } from '../types/api.types';
 import { CustomError } from '../types/cusom-error.types';
 
 import WebSocket from 'ws';
@@ -17,6 +17,22 @@ class DataService {
 
   public static getInstance(): DataService {
     return DataService.instance;
+  }
+
+  public addShipsToGame(boardData: AddShipsRequestData): boolean {
+    const { gameId, ships, indexPlayer } = boardData;
+    const game = this.gameStorage.find((game: Game) => game.gameId === gameId);
+    let isGameReadyToStart = false;
+    if (game) {
+      game.gameboards.forEach((gameboard) => {
+        if (gameboard.currentPlayerIndex === indexPlayer) {
+          gameboard.ships = [...ships];
+        }
+      });
+      isGameReadyToStart = game.gameboards.every((board: GameBoard) => !board.ships.length);
+    }
+
+    return isGameReadyToStart;
   }
 
   public createGame(ws: WebSocket): Game | null {

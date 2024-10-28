@@ -2,15 +2,9 @@ import { WebSocket } from 'ws';
 
 import DataService from '../services/data.service';
 import RoomController from '../controllers/room.controller';
-import {
-  AddUserToRoomRequestData,
-  CommonAction,
-  CreateGameResponseData,
-  User,
-} from '../types/api.types';
-import GameController from '../controllers/game.controller';
-import { Message } from '../types/message';
-import { Game, GameBoard } from '../services/gameboard.types';
+import { AddUserToRoomRequestData, CommonAction, User } from '../types/api.types';
+
+import { createGameRoute } from './game.route';
 
 export const createRoomRoute = (ws: WebSocket): void => {
   const room = DataService.createRoom();
@@ -25,18 +19,7 @@ export const addUserToRoomRoute = (ws: WebSocket, message: CommonAction): void =
 
   updateRoomsForAll();
 
-  const game = DataService.createGame(ws);
-  if (game) {
-    game.gameboards.forEach((board: GameBoard) => {
-      const data: CreateGameResponseData = {
-        idGame: game.gameId,
-        idPlayer: board.currentPlayerIndex,
-      };
-      GameController.createGame(board.ws, data);
-    });
-  } else {
-    console.warn(Message.CantCreateRoom);
-  }
+  createGameRoute(ws);
 };
 
 export const updateRoomsForAll = (): void => {

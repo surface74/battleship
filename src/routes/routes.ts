@@ -4,6 +4,7 @@ import { ApiMessageType, CommonAction } from '../types/api.types';
 import { regRoute } from './reg.route';
 import { Message } from '../types/message';
 import { createRoomRoute, addUserToRoomRoute } from './room.route';
+import { addShipsRoute } from './game.route';
 
 export const routes = (ws: WebSocket, data: Buffer): void => {
   const message = JSON.parse(data.toString()) as CommonAction;
@@ -21,6 +22,7 @@ export const routes = (ws: WebSocket, data: Buffer): void => {
       addUserToRoomRoute(ws, message);
       break;
     case ApiMessageType.AddShips:
+      addShipsRoute(ws, message);
       break;
     case ApiMessageType.Attack:
       break;
