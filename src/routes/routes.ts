@@ -39,6 +39,4 @@ export const routes = (ws: WebSocket, data: Buffer): void => {
       console.warn('%s: %s', Message.UnknownAction, data);
       break;
   }
-
-  console.log('received: %s', data);
 };

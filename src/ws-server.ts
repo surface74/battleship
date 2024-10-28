@@ -11,12 +11,11 @@ export const createWsServer = (port: number): void => {
     ws.on('message', (data: Buffer): void => routes(ws, data));
 
     ws.on('close', (code: number, reason: Buffer): void =>
-      console.log(`socket closed:${code} ${reason.toString()}`)
+      console.warn(`socket closed:${code} ${reason.toString()}`)
     );
-    ws.on('open', (): void => console.log('socket opened'));
   });
 
-  wss.on('error', (error: Error): void => console.log(error.message));
+  wss.on('error', (error: Error): void => console.error(error.message));
 
   wss.on('close', (): void => console.log(`${Message.BackStop}`));
 
