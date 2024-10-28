@@ -91,7 +91,7 @@ class DataService {
         attackedShip.shipStates.forEach((shipState: ShipState): void => {
           shipState.state = AttackResult.Killed;
           results.push({ ...shipState });
-          results.push(...this.getEmptyPlaceAround(attackedShip as Ship));
+          results.push(...this.getEmptyPlaceAround());
         });
       } else {
         results.push({ x, y, state: AttackResult.Shot });
@@ -103,17 +103,17 @@ class DataService {
     return results;
   }
 
-  getEmptyPlaceAround(ship: Ship): ShipState[] {
+  getEmptyPlaceAround(): ShipState[] {
     const states = new Array<ShipState>();
 
-    const { position, direction, length } = ship;
-    const { x, y } = position;
+    // const { position, direction, length } = ship;
+    // const { x, y } = position;
 
-    for (let i = 0; i < length; i++) {
-      if (direction) {
-      } else {
-      }
-    }
+    // for (let i = 0; i < length; i++) {
+    //   if (direction) {
+    //   } else {
+    //   }
+    // }
 
     return states;
   }
@@ -311,8 +311,23 @@ class DataService {
   }
 
   public regUser(ws: WebSocket, name: string, password: string): CustomError {
-    const user: User = { name, password, wins: 0, uuid: randomUUID(), ws };
-    this.userStorage.push(user);
+    const index = this.userStorage.findIndex((user: User) => user.name === name);
+    if (index === -1) {
+      const user: User = { name, password, wins: 0, uuid: randomUUID(), ws };
+      this.userStorage.push(user);
+      return { error: false, errorText: '' };
+    }
+
+    const user = this.userStorage[index];
+    if (user.password === password) {
+      if (user.ws.readyState === ws.OPEN || user.ws.readyState === ws.CONNECTING) {
+        return { error: true, errorText: Message.AlreadyConnected };
+      } else {
+        user.ws = ws;
+      }
+    } else {
+      return { error: true, errorText: Message.WrongPassword };
+    }
 
     return { error: false, errorText: '' };
   }

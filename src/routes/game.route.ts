@@ -7,7 +7,6 @@ import {
   AttackResponseData,
   CommonAction,
   CreateGameResponseData,
-  RandomAttackRequest,
   RandomAttackRequestData,
   ShipState,
   StartGameResponseData,

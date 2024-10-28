@@ -6,4 +6,6 @@ export enum Message {
   CantCreateRoom = 'Can`t create room',
   CantStartGame = 'Can`t start game',
   CantAddUserToRoom = 'Can`t add user to room',
+  AlreadyConnected = 'User is already connected',
+  WrongPassword = 'Wrong password',
 }
